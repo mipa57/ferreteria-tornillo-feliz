@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>El Tornillo Feliz | Sistema de Gestión</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen" class="login-screen">
+  <div class="login-bg">
+    <div class="bolt bolt-1">⚙</div>
+    <div class="bolt bolt-2">🔩</div>
+    <div class="bolt bolt-3">🔧</div>
+    <div class="bolt bolt-4">⚙</div>
+  </div>
+  <div class="login-card">
+    <div class="login-logo">
+      <span class="logo-icon">🔩</span>
+      <h1>El Tornillo Feliz</h1>
+      <p>Sistema de Gestión</p>
+    </div>
+    <div class="login-form">
+      <div class="field-group">
+        <label>Usuario</label>
+        <input type="text" id="login-user" placeholder="admin" />
+      </div>
+      <div class="field-group">
+        <label>Contraseña</label>
+        <input type="password" id="login-pass" placeholder="••••••••" />
+      </div>
+      <div id="login-error" class="login-error hidden">Usuario o contraseña incorrectos</div>
+      <button class="btn-login" onclick="login()">Ingresar al Sistema</button>
+      <p class="demo-hint">Demo: usuario <strong>admin</strong> / clave <strong>admin123</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" class="app hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <span>🔩</span>
+      <div>
+        <h2>El Tornillo</h2>
+        <p>Feliz</p>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" onclick="showSection('dashboard')">
+        <span class="nav-icon">📊</span><span>Dashboard</span>
+      </button>
+      <button class="nav-item" onclick="showSection('inventario')">
+        <span class="nav-icon">📦</span><span>Inventario</span>
+      </button>
+      <button class="nav-item" onclick="showSection('contabilidad')">
+        <span class="nav-icon">💰</span><span>Contabilidad</span>
+      </button>
+      <button class="nav-item" onclick="showSection('reportes')">
+        <span class="nav-icon">📈</span><span>Reportes</span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <span class="user-avatar">👷</span>
+        <div>
+          <p class="user-name">Admin</p>
+          <p class="user-role">Administrador</p>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="logout()">Salir</button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <!-- HEADER -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2 id="section-title">Dashboard</h2>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="current-date"></div>
+        <div class="alert-badge" id="alert-badge" onclick="showSection('inventario')">
+          <span>⚠️</span><span id="alert-count">0</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== DASHBOARD ===== -->
+    <section id="section-dashboard" class="section active">
+      <div class="stats-grid">
+        <div class="stat-card stat-blue">
+          <div class="stat-icon">📦</div>
+          <div class="stat-info">
+            <p class="stat-label">Total Productos</p>
+            <h3 class="stat-value" id="stat-productos">0</h3>
+          </div>
+        </div>
+        <div class="stat-card stat-green">
+          <div class="stat-icon">💵</div>
+          <div class="stat-info">
+            <p class="stat-label">Ingresos del Mes</p>
+            <h3 class="stat-value" id="stat-ingresos">$0</h3>
+          </div>
+        </div>
+        <div class="stat-card stat-red">
+          <div class="stat-icon">💸</div>
+          <div class="stat-info">
+            <p class="stat-label">Egresos del Mes</p>
+            <h3 class="stat-value" id="stat-egresos">$0</h3>
+          </div>
+        </div>
+        <div class="stat-card stat-yellow">
+          <div class="stat-icon">⚠️</div>
+          <div class="stat-info">
+            <p class="stat-label">Stock Bajo</p>
+            <h3 class="stat-value" id="stat-bajo">0</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="card">
+          <h3 class="card-title">Balance del Mes</h3>
+          <div class="balance-display">
+            <div class="balance-bar-container">
+              <div class="balance-bar" id="balance-bar"></div>
+            </div>
+            <div class="balance-numbers">
+              <span class="income-tag">+ <span id="bal-ingresos">$0</span></span>
+              <span class="expense-tag">- <span id="bal-egresos">$0</span></span>
+              <span class="net-tag" id="bal-neto">= $0</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h3 class="card-title">⚠️ Alertas de Stock Bajo</h3>
+          <div id="dashboard-alerts" class="alerts-list">
+            <p class="empty-msg">Sin alertas activas</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Últimas Transacciones</h3>
+        <div id="dashboard-transactions" class="mini-table"></div>
+      </div>
+    </section>
+
+    <!-- ===== INVENTARIO ===== -->
+    <section id="section-inventario" class="section hidden">
+      <div class="section-actions">
+        <input type="text" id="search-inv" placeholder="🔍 Buscar producto..." class="search-input" oninput="filtrarProductos()" />
+        <button class="btn-primary" onclick="abrirModalProducto()">+ Agregar Producto</button>
+      </div>
+
+      <div class="card">
+        <table class="data-table" id="tabla-productos">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Nombre</th>
+              <th>Cantidad</th>
+              <th>Precio Unit.</th>
+              <th>Valor Total</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-productos">
+            <tr><td colspan="7" class="empty-row">No hay productos registrados</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== CONTABILIDAD ===== -->
+    <section id="section-contabilidad" class="section hidden">
+      <div class="section-actions">
+        <div class="filter-group">
+          <select id="filter-tipo" onchange="filtrarTransacciones()" class="select-input">
+            <option value="">Todos</option>
+            <option value="venta">Ventas</option>
+            <option value="compra">Compras</option>
+          </select>
+        </div>
+        <button class="btn-primary" onclick="abrirModalTransaccion('venta')">+ Registrar Venta</button>
+        <button class="btn-secondary" onclick="abrirModalTransaccion('compra')">+ Registrar Compra</button>
+      </div>
+
+      <div class="stats-grid" style="margin-bottom:1.5rem">
+        <div class="stat-card stat-green">
+          <div class="stat-icon">📈</div>
+          <div class="stat-info">
+            <p class="stat-label">Total Ingresos</p>
+            <h3 class="stat-value" id="total-ingresos-cont">$0</h3>
+          </div>
+        </div>
+        <div class="stat-card stat-red">
+          <div class="stat-icon">📉</div>
+          <div class="stat-info">
+            <p class="stat-label">Total Egresos</p>
+            <h3 class="stat-value" id="total-egresos-cont">$0</h3>
+          </div>
+        </div>
+        <div class="stat-card stat-blue">
+          <div class="stat-icon">💎</div>
+          <div class="stat-info">
+            <p class="stat-label">Balance Neto</p>
+            <h3 class="stat-value" id="balance-neto-cont">$0</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Tipo</th>
+              <th>Detalle</th>
+              <th>Monto</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-transacciones">
+            <tr><td colspan="5" class="empty-row">No hay transacciones registradas</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== REPORTES ===== -->
+    <section id="section-reportes" class="section hidden">
+      <div class="reportes-grid">
+        <div class="card">
+          <h3 class="card-title">📊 Resumen General</h3>
+          <div id="reporte-resumen" class="reporte-content"></div>
+        </div>
+        <div class="card">
+          <h3 class="card-title">📦 Top 5 Productos por Valor</h3>
+          <div id="reporte-top-productos" class="reporte-content"></div>
+        </div>
+        <div class="card full-width">
+          <h3 class="card-title">💹 Flujo de Caja (Últimas transacciones)</h3>
+          <div id="reporte-flujo" class="chart-container">
+            <canvas id="flujo-chart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- MODAL PRODUCTO -->
+<div id="modal-producto" class="modal hidden">
+  <div class="modal-overlay" onclick="cerrarModal('modal-producto')"></div>
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 id="modal-prod-title">Agregar Producto</h3>
+      <button class="modal-close" onclick="cerrarModal('modal-producto')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="prod-id" />
+      <div class="field-group">
+        <label>Código</label>
+        <input type="text" id="prod-codigo" placeholder="ej: P001" />
+      </div>
+      <div class="field-group">
+        <label>Nombre del Producto</label>
+        <input type="text" id="prod-nombre" placeholder="ej: Martillo" />
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label>Cantidad</label>
+          <input type="number" id="prod-cantidad" placeholder="0" min="0" />
+        </div>
+        <div class="field-group">
+          <label>Precio Unitario ($)</label>
+          <input type="number" id="prod-precio" placeholder="0.00" step="0.01" />
+        </div>
+      </div>
+      <div id="prod-error" class="form-error hidden"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="cerrarModal('modal-producto')">Cancelar</button>
+      <button class="btn-primary" onclick="guardarProducto()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL TRANSACCION -->
+<div id="modal-transaccion" class="modal hidden">
+  <div class="modal-overlay" onclick="cerrarModal('modal-transaccion')"></div>
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 id="modal-trans-title">Registrar Transacción</h3>
+      <button class="modal-close" onclick="cerrarModal('modal-transaccion')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="trans-tipo" />
+      <div class="field-group">
+        <label>Fecha</label>
+        <input type="date" id="trans-fecha" />
+      </div>
+      <div class="field-group">
+        <label>Detalle / Descripción</label>
+        <input type="text" id="trans-detalle" placeholder="ej: Venta de tornillos x20" />
+      </div>
+      <div class="field-group">
+        <label>Monto ($)</label>
+        <input type="number" id="trans-monto" placeholder="0.00" step="0.01" min="0" />
+      </div>
+      <div id="trans-error" class="form-error hidden"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="cerrarModal('modal-transaccion')">Cancelar</button>
+      <button class="btn-primary" onclick="guardarTransaccion()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast hidden"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
