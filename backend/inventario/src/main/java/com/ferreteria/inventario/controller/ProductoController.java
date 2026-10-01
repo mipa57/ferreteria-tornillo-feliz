@@ -17,6 +17,9 @@ public class ProductoController {
     @Autowired
     private ProductoRepository repository;
 
+    @Autowired
+    private N8nNotificationService n8nNotificationService;
+
     // GET todos
     @GetMapping
     public List<Producto> obtenerTodos() {
@@ -36,7 +39,47 @@ public class ProductoController {
         if (existente.isPresent()) {
             return ResponseEntity.badRequest().body("Error: ya existe un producto con ese codigo.");
         }
-        return ResponseEntity.ok(repository.save(producto));
+        
+        Producto guardado = repository.save(producto);
+
+        // Disparar alerta si ingresa con stock crítico
+        if (guardado.getCantidad() <= 5) {
+            n8nNotificationService.enviarAlertaStockBajo(
+                guardado.getNombre(),
+                guardado.getCodigo(),
+                guardado.getCantidad(),
+                5,
+                "Herramientas Industrias S.A."
+            );
+        }
+
+        return ResponseEntity.ok(guardado);
+    }
+
+    // PUT actualizar
+    @PutMapping("/{id}")
+    public ResponseEntity<?> actualizar(@PathVariable String id, @RequestBody Producto datos) {
+        return repository.findById(id).map(prod -> {
+            prod.setCodigo(datos.getCodigo());
+            prod.setNombre(datos.getNombre());
+            prod.setCantidad(datos.getCantidad());
+            prod.setPrecioUnitario(datos.getPrecioUnitario());
+
+            Producto actualizado = repository.save(prod);
+
+            // Disparar alerta si la cantidad baja a 5 o menos
+            if (actualizado.getCantidad() <= 5) {
+                n8nNotificationService.enviarAlertaStockBajo(
+                    actualizado.getNombre(),
+                    actualizado.getCodigo(),
+                    actualizado.getCantidad(),
+                    5,
+                    "Herramientas Industrias S.A."
+                );
+            }
+
+            return ResponseEntity.ok(actualizado);
+        }).orElse(ResponseEntity.notFound().build());
     }
 
     // PUT actualizar
