@@ -2,6 +2,7 @@ package com.ferreteria.inventario.controller;
 
 import com.ferreteria.inventario.model.Producto;
 import com.ferreteria.inventario.repository.ProductoRepository;
+import com.ferreteria.inventario.service.N8nNotificationService; // <-- Se agregó el import
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -56,7 +57,7 @@ public class ProductoController {
         return ResponseEntity.ok(guardado);
     }
 
-    // PUT actualizar
+    // PUT actualizar (ÚNICO método de actualización)
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizar(@PathVariable String id, @RequestBody Producto datos) {
         return repository.findById(id).map(prod -> {
@@ -79,18 +80,6 @@ public class ProductoController {
             }
 
             return ResponseEntity.ok(actualizado);
-        }).orElse(ResponseEntity.notFound().build());
-    }
-
-    // PUT actualizar
-    @PutMapping("/{id}")
-    public ResponseEntity<?> actualizar(@PathVariable String id, @RequestBody Producto datos) {
-        return repository.findById(id).map(prod -> {
-            prod.setCodigo(datos.getCodigo());
-            prod.setNombre(datos.getNombre());
-            prod.setCantidad(datos.getCantidad());
-            prod.setPrecioUnitario(datos.getPrecioUnitario());
-            return ResponseEntity.ok(repository.save(prod));
         }).orElse(ResponseEntity.notFound().build());
     }
 
